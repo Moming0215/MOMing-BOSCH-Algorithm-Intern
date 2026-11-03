@@ -5,9 +5,12 @@
 **把 AI 放进真实工程流程里**  
 LLM Applications · RAG · Agentic AI · Internal Digital Products
 
+**🏆 BOSCH BBM AI DAY · 第二名（2nd Place）**  
+**2026 Bosch China AI Day · Top 4 Most Impressive Topics**
+
 [![2026 Bosch China AI Day](assets/00-bosch-ai-day.jpg)](assets/00-bosch-ai-day.jpg)
 
-**2026 Bosch China AI Day Awarding · Top 4 Most Impressive Topics**  
+*2026 Bosch China AI Day 颁奖现场 · BBM AI Day 第二名*  
 📷 图中**从右数第 2 位**（白 T 恤、戴眼镜）就是我
 
 </div>
@@ -18,7 +21,7 @@ LLM Applications · RAG · Agentic AI · Internal Digital Products
 
 我是 **MO Ming**，在博世中国 **XC/QMS-CN** 做算法实习。
 
-这张照片拍摄于 **2026 Bosch China AI Day** 的颁奖现场，我参与的项目入选 **Top 4 Most Impressive Topics**。照片里，从右数第 2 位、穿白色 T 恤、戴眼镜的人就是我。
+这张照片拍摄于 **2026 Bosch China AI Day** 的颁奖现场。我参与的项目在 **BOSCH BBM AI DAY** 中获得 **第二名（2nd Place）**，并入选 **2026 Bosch China AI Day Top 4 Most Impressive Topics**。照片里，从右数第 2 位、穿白色 T 恤、戴眼镜的人就是我。
 
 这段实习里，我主要在做一件事：
 
@@ -187,6 +190,8 @@ AI 预审、人工终审、单独存档、不写入正式统计——这些看�
 ## English Snapshot
 
 I'm **MO Ming**, an algorithm intern at **Bosch China (XC/QMS-CN)**. I build internal AI products that turn LLM capabilities into traceable, governable, and operable workflows.
+
+At **BOSCH BBM AI Day**, my project won **2nd Place** and was selected among the **Top 4 Most Impressive Topics** at the 2026 Bosch China AI Day.
 
 This repository is a screenshot-based portfolio. It covers an internal **Digital Platform / App Store**, a **RAG-based audit assistant (CodexConcern)**, **CAN bus failure-log analysis**, **LLM token & cost governance (Q-Model Farm)**, and **AI-assisted reflash review (Reflash Space)**.
 
