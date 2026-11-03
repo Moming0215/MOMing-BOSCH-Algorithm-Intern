@@ -1,0 +1,15 @@
+# Original, unredacted screenshots stay local.
+_originals/
+/*.png
+/*.jpg
+/*.jpeg
+
+# Temporary image-editing artifacts
+_crop*.png
+_line*.png
+_grid*.png
+*.tmp
+
+# OS files
+.DS_Store
+Thumbs.db
