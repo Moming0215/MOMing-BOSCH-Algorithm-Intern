@@ -27,10 +27,10 @@ LLM Applications · RAG · Agentic AI · Internal Digital Products
 
 > **让大模型从“会回答”，变成“能被信任地放进工程流程里”。**
 
-从内部应用的统一入口，到能追溯证据的审核助手；从 CAN 故障日志分析，到刷件记录的 AI 预审——这些系统面向的不是演示，而是真实业务流程中的“找得到、用得上、可治理”。
+从内部应用的统一入口，到能追溯证据的审核助手；从 CAN 故障日志分析、刷件 AI 预审，到 Early-D 合同自动填写——这些系统面向的不是演示，而是真实业务流程中的“找得到、用得上、可治理”。
 
 > **关于这个仓库**  
-> 因博世内部数据合规要求，我不能上传源代码、原始业务数据或内部文档。这里用产品界面截图记录我参与设计、开发的系统，重点展示问题定义、产品思路与工程能力。截图中的同事邮箱已打码，界面内容仅作能力展示。
+> 因博世内部数据合规要求，我不能上传源代码、原始业务数据或内部文档。这里用产品界面截图记录我参与设计、开发的系统，重点展示问题定义、产品思路与工程能力。截图中的同事邮箱、客户与联系人信息已打码，界面内容仅作能力展示。
 
 ---
 
@@ -43,6 +43,7 @@ LLM Applications · RAG · Agentic AI · Internal Digital Products
 | 03 | **Failure Log Analysis** | CAN 日志门槛高，故障定位依赖人工翻找 | DBC · ASC/BLF · 信号分析 |
 | 04 | **Q-Model Farm** | 模型调用成本和用量像“黑盒” | LiteLLM · Token 计量 · 成本归因 |
 | 05 | **Reflash Space** | 刷件审核依赖人工逐条判断 | AI 预审 · Human-in-the-loop · 审计留痕 |
+| 06 | **Early-D Contract Assistant** | 合同字段重复填写、模板映射容易出错 | 文档自动化 · 字段映射 · PDF 导出 |
 
 ---
 
@@ -85,12 +86,13 @@ LLM Applications · RAG · Agentic AI · Internal Digital Products
 
 **其他能力：**
 
-- 按项目 / concern 发起检索与追问；
+- 按项目 / concern 发起检索与多轮追问；
+- **批量审核**：选定目录后预览待审条目、已审跳过数量和预计耗时，确认后串行执行，并在页面顶部显示进度；
 - 展示命中的项目文件和“查了哪些资料”；
 - 维护审核知识库、审核历史与会话记录；
 - 把“判定规则”沉淀成可复用的审核知识。
 
-`RAG` · `Citation / Evidence` · `Audit Knowledge Base` · `Conversational Search`
+`RAG` · `Citation / Evidence` · `Batch Audit` · `Audit Knowledge Base` · `Conversational Search`
 
 ---
 
@@ -102,16 +104,24 @@ LLM Applications · RAG · Agentic AI · Internal Digital Products
 
 分析一份 CAN 故障日志，通常需要同时处理两类文件：描述报文和字节布局的 **DBC 信号定义文件**，以及记录总线通信的 **ASC 文本 / BLF 二进制日志**。过去这类工作往往依赖个人脚本和经验，门槛高、复用难。
 
+[![Failure Log signal view](assets/03b-failure-log-signals.png)](assets/03b-failure-log-signals.png)
+
+*信号视图：多信号叠加、时间轴缩放，以及联动面板 / 单独视图*
+
+[![Failure Log AI report](assets/03c-failure-log-ai-report.png)](assets/03c-failure-log-ai-report.png)
+
+*AI 诊断报告：结论摘要、解析范围与支持结论的报文证据*
+
 这个系统把流程产品化：
 
 - **文件配对**：左侧共享仓库按客户 / 项目组织，DBC 与日志可以本地上传或直接选择；
-- **信号解码**：基于 DBC 把原始报文还原成可读的信号；
-- **AI 辅助分析**：在信号视图之上提供 AI Analysis（Beta），帮助定位异常和生成分析线索；
+- **信号解码与可视化**：基于 DBC 把原始报文还原成可读信号，支持多信号叠加、时间轴定位和联动查看；
+- **AI 辅助分析**：在信号视图之上提供 AI Analysis（Beta），生成包含结论、证据、时间基准和解析完整性的诊断报告；
 - **共享协作**：项目、文件、日志集中管理，减少“文件在谁电脑上”的沟通成本。
 
 **价值：** 把一次性的排障脚本，变成团队可以反复使用的分析工具。
 
-`CAN Bus` · `DBC Parsing` · `ASC / BLF` · `Signal Analysis` · `AI-assisted Diagnosis`
+`CAN Bus` · `DBC Parsing` · `ASC / BLF` · `Signal Visualization` · `AI-assisted Diagnosis`
 
 ---
 
@@ -145,14 +155,40 @@ LLM Applications · RAG · Agentic AI · Internal Digital Products
 
 刷件（Reflash）记录审核需要逐条核对信息。记录量大、规则细，完全依赖人工既慢又容易不一致。Reflash Space 的 AI 审核模块把这件事拆成“**AI 预审 + 人工复核**”：
 
-- 对记录给出 **通过 / 需人工复核 / 不通过** 三类结论；
+- 输入 E-Workflow 记录 ID 或完整链接即可发起审核；
+- 对记录给出 **通过 / 需人工介入 / 不通过 / 冲突** 四类结果，并展示关键版本、料号、CoverSheet、XFLASH 等核对依据；
 - 支持按记录 ID、名称搜索，按结论筛选；
 - 保留历史记录、耗时和人工裁决入口；
 - 测试阶段明确提示：**结论仅供参考，不影响正式回填流程，结果与人工裁决单独存档，不写入正式统计**。
 
+[![Reflash Space audit history](assets/05b-reflash-audit-history.png)](assets/05b-reflash-audit-history.png)
+
+*历史记录：每次审核的结论、耗时、人工裁决与删除入口*
+
 最后这一点很关键：AI 可以提效，但不能悄悄改变正式流程。**可解释、可回退、可审计**，才是内部 AI 产品能长期运行的前提。
 
 `AI Review` · `Human-in-the-loop` · `Rule Configuration` · `Audit Trail`
+
+---
+
+## 06 · Early-D Contract Assistant
+
+### 把合同填写变成“字段到文档”的自动映射
+
+[![Early-D Contract Assistant](assets/06-earlyd-contract.png)](assets/06-earlyd-contract.png)
+
+*界面中的客户与联系人信息已脱敏*
+
+Early-D 样品合同 / 协议的准备涉及 BU、博世联系人、客户公司、技术 / 质量负责人等字段，以及固定的合同模板。这个工具把重复的手工填写变成**结构化录入 + 模板渲染**：
+
+- **结构化表单**：选择 BU、联系人和客户信息，支持保存数据、导入数据与重试连接；
+- **字段到文档映射**：把表单字段映射到合同模板的对应位置，实时生成预览；
+- **一键导出**：确认预览后直接导出 PDF；
+- **减少低级错误**：字段复用、模板统一，避免同一信息在多个文档中反复填写不一致。
+
+**价值：** 把“找模板、填字段、反复核对”的文书工作，变成一条可复用的自动化流程。
+
+`Document Automation` · `Field Mapping` · `Template Rendering` · `PDF Export`
 
 ---
 
@@ -183,6 +219,7 @@ AI 预审、人工终审、单独存档、不写入正式统计——这些看�
 | **LLM 应用** | RAG、引用溯源、结构化输出、审核助手、AI 预审 |
 | **平台工程** | Web 全栈、RBAC、审批流、应用目录、审计日志 |
 | **数据与工程** | CAN DBC、ASC / BLF、日志解析、指标看板、成本归因 |
+| **文档自动化** | 结构化表单、字段映射、合同模板渲染、PDF 导出 |
 | **产品化** | 需求拆解、流程建模、原型设计、前后端联调、上线迭代 |
 
 ---
@@ -193,9 +230,9 @@ I'm **MO Ming**, an algorithm intern at **Bosch China (XC/QMS-CN)**. I build int
 
 At **BOSCH BBM AI Day**, my project won **2nd Place** and was selected among the **Top 4 Most Impressive Topics** at the 2026 Bosch China AI Day.
 
-This repository is a screenshot-based portfolio. It covers an internal **Digital Platform / App Store**, a **RAG-based audit assistant (CodexConcern)**, **CAN bus failure-log analysis**, **LLM token & cost governance (Q-Model Farm)**, and **AI-assisted reflash review (Reflash Space)**.
+This repository is a screenshot-based portfolio. It covers an internal **Digital Platform / App Store**, a **RAG-based audit assistant (CodexConcern)**, **CAN bus failure-log analysis**, **LLM token & cost governance (Q-Model Farm)**, **AI-assisted reflash review (Reflash Space)**, and **Early-D contract automation**.
 
-> Due to Bosch data-compliance requirements, no source code, business data, or internal documents are included. Colleague email addresses in the screenshots have been redacted. The views expressed here are my own and do not represent Bosch.
+> Due to Bosch data-compliance requirements, no source code, business data, or internal documents are included. Colleague email addresses and customer/contact information in the screenshots have been redacted. The views expressed here are my own and do not represent Bosch.
 
 ---
 
@@ -204,7 +241,7 @@ This repository is a screenshot-based portfolio. It covers an internal **Digital
 - 本仓库是**个人作品集**，不是博世官方仓库；文中观点仅代表个人。
 - 不包含博世源代码、内部文档或客户数据文件；截图只展示产品界面与交互。
 - 截图仅用于展示产品界面与个人参与的工作；部分功能处于 Beta / 测试阶段。
-- 截图中的同事邮箱已做打码处理；如仍有不应公开的信息，请通过 GitHub 联系我，我会尽快调整或撤下。
+- 截图中的同事邮箱、客户名称与联系人信息已做打码 / 模糊处理；如仍有不应公开的信息，请通过 GitHub 联系我，我会尽快调整或撤下。
 - “Bosch” 名称及相关商标归 Robert Bosch GmbH 所有。
 
 <div align="center">
