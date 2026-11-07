@@ -1,6 +1,9 @@
 # Internal project notes: never publish.
 项目描述.txt
 
+# Local resume / documents: never publish.
+/*.pdf
+
 # Original, unredacted screenshots stay local.
 _originals/
 /*.png
